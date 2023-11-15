@@ -307,7 +307,7 @@ const insertCandlestickBatch = async (tableName, batch) => {
 
 
 const getHistory = async (symbols) => {
-    const chunkSize = 50;
+    const chunkSize = 1;
     const symbolChunks = [];
     const delayTime = 3000;
     let currentIndex = 0;
