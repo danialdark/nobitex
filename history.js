@@ -180,6 +180,7 @@ const startspotHistory = async (symbol) => {
 
         let flag = true;
         const candlestickBatch = [];
+        const usedOpenTimes = []
 
         while (flag) {
             // if (requestCounter >= 300) {
@@ -192,9 +193,8 @@ const startspotHistory = async (symbol) => {
             // }
 
             const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=${startTime}&to=${currentTimestampInSeconds}&page=${page}`);
-            // console.log(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=${startTime}&to=${currentTimestampInSeconds}&page=${page}`)
             // requestCounter++;
-            page++;
+            page = 500;
 
             if (response.status !== 200) {
                 throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
@@ -209,26 +209,28 @@ const startspotHistory = async (symbol) => {
             const candlestickData = response.data.t.map((timestamp, index) => {
 
                 const formattedDateTime = moment(timestamp * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
-
-                return {
-                    symbol_id: fetchedSymbolId,
-                    symbol_name: symbolName,
-                    open_time: timestamp * 1000,
-                    open_price: formatNumberWithTwoDecimals(response.data.o[index]),
-                    high_price: formatNumberWithTwoDecimals(response.data.h[index]),
-                    low_price: formatNumberWithTwoDecimals(response.data.l[index]),
-                    close_price: formatNumberWithTwoDecimals(response.data.c[index]),
-                    volumn: response.data.v[index],
-                    close_time: response.data.c[index], // Assuming close_time is the next timestamp
-                    created_at: formattedDateTime,
-                };
+                const found = usedOpenTimes.find(usedOpenTime => usedOpenTime == formattedDateTime);
+                usedOpenTimes.push(formattedDateTime)
+                if (found == undefined) {
+                    return {
+                        symbol_id: fetchedSymbolId,
+                        symbol_name: symbolName,
+                        open_time: timestamp * 1000,
+                        open_price: formatNumberWithTwoDecimals(response.data.o[index]),
+                        high_price: formatNumberWithTwoDecimals(response.data.h[index]),
+                        low_price: formatNumberWithTwoDecimals(response.data.l[index]),
+                        close_price: formatNumberWithTwoDecimals(response.data.c[index]),
+                        volumn: response.data.v[index],
+                        close_time: response.data.c[index], // Assuming close_time is the next timestamp
+                        created_at: formattedDateTime,
+                    };
+                }
             });
 
 
 
-            // console.log(candlestickData)
 
-            if (candlestickData.length === 0) {
+            if (candlestickData.length === 0 || candlestickData[0] == undefined) {
                 flag = false;
                 continue;
             }

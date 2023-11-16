@@ -69,7 +69,7 @@ async function updateRedisPrice(symbols) {
                 var newPrice = response.data[symbol.toUpperCase()].lastTradePrice
                 if (newPrice != undefined) {
                     data[timeFrame][0].c = newPrice / 10+".00";
-                    console.log(newPrice / 10+".00")
+                    // console.log(newPrice / 10+".00")
                 }
             }
         }
@@ -331,5 +331,5 @@ setInterval(() => {
     updateRedisPrice(["BTCIRT"])
 }, 1500);
 
-getHistory(["BTCIRT"])
-// module.exports = getHistory
+
+module.exports = getHistory
