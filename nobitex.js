@@ -27,9 +27,9 @@ getSpotSymbols().then((data) => {
     // getHistory(data);
     getLive(data);
 
-    setInterval(() => {
-        updateRedisPrice(data)
-    }, 1500);
+    // setInterval(() => {
+    //     updateRedisPrice(data)
+    // }, 1500);
 });
 
 
