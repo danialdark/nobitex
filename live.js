@@ -68,8 +68,8 @@ async function updateRedisPrice(symbols) {
             if (data.hasOwnProperty(timeFrame)) {
                 var newPrice = response.data[symbol.toUpperCase()].lastTradePrice
                 if (newPrice != undefined) {
-                    data[timeFrame][0].c = newPrice / 10+".00";
-                    // console.log(newPrice / 10+".00")
+                    data[timeFrame][0].c = newPrice / 10 + ".00";
+                    // console.log(newPrice / 10 + ".00")
                 }
             }
         }
@@ -110,15 +110,17 @@ const getTimeFrameKey = (timeFrame) => {
 const saveCandlesToRedis = async (symbol, timeFrame, batch) => {
     const symbolKey = symbol.toLowerCase();
     const existingData = await redis.get(symbolKey);
-
     let dataToUpdate = {};
-    if (existingData) {
+    if (existingData != "null" && existingData != null) {
         try {
             dataToUpdate = JSON.parse(existingData);
         } catch (error) {
             console.error('Error parsing existing data from Redis:', error);
         }
+    } else {
+        dataToUpdate = {};
     }
+
 
     const timeFrameKey = getTimeFrameKey(timeFrame); // Helper function to get the time frame key
 
@@ -165,6 +167,12 @@ const startspotHistory = async (symbol) => {
         if (response.status !== 200) {
             throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
         }
+
+        if (response.data.s == "no_data" || response.data.t.length == 1) {
+            flag = false;
+            continue;
+        }
+
         const candlestickData = response.data.t.map((timestamp, index) => {
             const formattedDateTime = moment(timestamp * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
 
@@ -274,11 +282,13 @@ const insertCandlestickBatch = async (tableName, batch) => {
 };
 
 
-
-const getHistory = async (symbols) => {
-    const chunkSize = 50;
+const getLive = async (symbols) => {
+    const chunkSize = 100;
     const symbolChunks = [];
     const delayTime = 3000;
+
+
+
     let currentIndex = 0;
     while (currentIndex < symbols.length) {
         const chunk = symbols.slice(currentIndex, currentIndex + chunkSize);
@@ -313,10 +323,9 @@ const getHistory = async (symbols) => {
                 console.log(`***done getting history for ${symbol}***`);
             });
         } else {
-            // console.log('All chunks processed');
 
             // Rerun the function if needed
-            getHistory(symbols);
+            getLive(symbols);
 
             return;
         }
@@ -327,9 +336,5 @@ const getHistory = async (symbols) => {
 };
 
 
-setInterval(() => {
-    updateRedisPrice(["BTCIRT"])
-}, 1500);
 
-
-module.exports = getHistory
+module.exports = { getLive, updateRedisPrice }
