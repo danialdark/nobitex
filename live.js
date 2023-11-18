@@ -169,11 +169,13 @@ const startspotHistory = async (symbol) => {
         }
 
         if (response.status == 502) {
-            await sleep(2000); // Wait for 5 seconds
-            console.log("restarting app on 2 sec");
-            flag = false;
-            continue;
+            console.error('Received a 502 error. PM2 will automatically restart the app.');
         }
+
+        if (response.status == 429) {
+            console.error('Received a 429 error. PM2 will automatically restart the app.');
+        }
+
 
         if (response.data.s == "no_data" || response.data.t.length == 1) {
             flag = false;
