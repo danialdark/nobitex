@@ -168,7 +168,7 @@ const startspotHistory = async (symbol) => {
             throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
         }
 
-        if (response.status !== 502) {
+        if (response.status == 502) {
             await sleep(2000); // Wait for 5 seconds
             console.log("restarting app on 2 sec");
             flag = false;
