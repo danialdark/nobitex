@@ -211,6 +211,7 @@ const startspotHistory = async (symbol) => {
         } catch (error) {
             if (error.response && (error.response.status === 502 || error.response.status === 429)) {
                 console.error(`Received a ${error.response.status} error. Restarting the app...`);
+                process.exit(1)
                 return false; // Assuming you want to stop execution on 502 or 429 errors
             } else {
                 throw error;
