@@ -152,63 +152,69 @@ const saveCandlesToRedis = async (symbol, timeFrame, batch) => {
 
 
 
+const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSeconds) => {
+    try {
+        const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`);
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            const { status, statusText } = error.response;
+            throw new Error(`Failed to fetch candlestick data. Status: ${status}, Message: ${statusText}`);
+        }
+        throw error;
+    }
+};
+
+const processCandlestickData = (symbolId, symbolName, data) => {
+    if (data.s === "no_data" || data.t.length === 1) {
+        return [];
+    }
+
+    return data.t.map((timestamp, index) => {
+        const formattedDateTime = moment(timestamp * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
+        return {
+            symbol_id: symbolId,
+            symbol_name: symbolName,
+            open_time: timestamp * 1000,
+            open_price: formatNumberWithTwoDecimals(data.o[index]),
+            high_price: formatNumberWithTwoDecimals(data.h[index]),
+            low_price: formatNumberWithTwoDecimals(data.l[index]),
+            close_price: formatNumberWithTwoDecimals(data.c[index]),
+            volumn: data.v[index],
+            close_time: 0, // Assuming close_time is the next timestamp
+            created_at: formattedDateTime,
+        };
+    });
+};
+
 const startspotHistory = async (symbol) => {
     const timeFrames = ['D', '240', '60', '30', '15', '5', '1'];
-
     const symbolName = symbol.toUpperCase();
-
     const fetchedSymbolId = await getSymbolIdByName(symbolName);
-    let currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+    const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
 
     for (const timeFrame of timeFrames) {
-        const tableName = getTableName(timeFrame); // Helper function to get the table name
+        try {
+            const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
 
-        const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`);
-        if (response.status !== 200) {
-            throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
-        }
+            if (candlestickData.length === 0) {
+                continue;
+            }
 
-        if (response.status == 502) {
-            console.error('Received a 502 error. Restarting the app...');
-            flag = false;
-            continue;
-        }
+            const processedData = processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
 
-        if (response.status == 429) {
-            console.error('Received a 429 error. Restarting the app...');
-            flag = false;
-            continue;
-        }
-
-
-        if (response.data.s == "no_data" || response.data.t.length == 1) {
-            flag = false;
-            continue;
-        }
-
-        const candlestickData = response.data.t.map((timestamp, index) => {
-            const formattedDateTime = moment(timestamp * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
-
-            return {
-                symbol_id: fetchedSymbolId,
-                symbol_name: symbolName,
-                open_time: timestamp * 1000,
-                open_price: formatNumberWithTwoDecimals(response.data.o[index]),
-                high_price: formatNumberWithTwoDecimals(response.data.h[index]),
-                low_price: formatNumberWithTwoDecimals(response.data.l[index]),
-                close_price: formatNumberWithTwoDecimals(response.data.c[index]),
-                volumn: response.data.v[index],
-                close_time: 0, // Assuming close_time is the next timestamp
-                created_at: formattedDateTime,
-            };
-        });
-
-        // Insert the last two candlesticks into the database
-        if (candlestickData.length >= 2) {
-            const lastTwoCandlesticks = candlestickData.slice(-2);
-            await saveCandlesToRedis(symbol, timeFrame, lastTwoCandlesticks);
-            // console.log(lastTwoCandlesticks)
-            await insertCandlestickBatch(tableName, lastTwoCandlesticks);
+            if (processedData.length >= 2) {
+                const lastTwoCandlesticks = processedData.slice(-2);
+                await saveCandlesToRedis(symbol, timeFrame, lastTwoCandlesticks);
+                await insertCandlestickBatch(getTableName(timeFrame), lastTwoCandlesticks);
+            }
+        } catch (error) {
+            if (error.response && (error.response.status === 502 || error.response.status === 429)) {
+                console.error(`Received a ${error.response.status} error. Restarting the app...`);
+                return false; // Assuming you want to stop execution on 502 or 429 errors
+            } else {
+                throw error;
+            }
         }
     }
 
