@@ -168,6 +168,12 @@ const startspotHistory = async (symbol) => {
             throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
         }
 
+        if (response.status !== 502) {
+            await sleep(5000); // Wait for 5 seconds
+            flag = false;
+            continue;
+        }
+
         if (response.data.s == "no_data" || response.data.t.length == 1) {
             flag = false;
             continue;
