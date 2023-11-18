@@ -159,7 +159,10 @@ const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSec
     } catch (error) {
         if (error.response) {
             const { status, statusText } = error.response;
-            throw new Error(`Failed to fetch candlestick data. Status: ${status}, Message: ${statusText}`);
+            console.error(`Received a ${error.response.status} error. Restarting the app...`);
+            process.exit(1)
+
+
         }
         throw error;
     }
