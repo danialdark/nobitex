@@ -283,7 +283,7 @@ const insertCandlestickBatch = async (tableName, batch) => {
 
 
 const getLive = async (symbols) => {
-    const chunkSize = 100;
+    const chunkSize = 30;
     const symbolChunks = [];
     const delayTime = 3000;
 
