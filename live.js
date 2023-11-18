@@ -169,7 +169,8 @@ const startspotHistory = async (symbol) => {
         }
 
         if (response.status !== 502) {
-            await sleep(5000); // Wait for 5 seconds
+            await sleep(2000); // Wait for 5 seconds
+            console.log("restarting app on 2 sec");
             flag = false;
             continue;
         }
