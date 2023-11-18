@@ -169,11 +169,15 @@ const startspotHistory = async (symbol) => {
         }
 
         if (response.status == 502) {
-            console.error('Received a 502 error. PM2 will automatically restart the app.');
+            console.error('Received a 502 error. Restarting the app...');
+            flag = false;
+            continue;
         }
 
         if (response.status == 429) {
-            console.error('Received a 429 error. PM2 will automatically restart the app.');
+            console.error('Received a 429 error. Restarting the app...');
+            flag = false;
+            continue;
         }
 
 
