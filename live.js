@@ -160,6 +160,7 @@ const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSec
         if (error.response) {
             const { status, statusText } = error.response;
             console.error(`Received a ${error.response.status} error. Restarting the app...`);
+            sleep(10000)
             process.exit(1)
 
 
@@ -214,6 +215,7 @@ const startspotHistory = async (symbol) => {
         } catch (error) {
             if (error.response && (error.response.status === 502 || error.response.status === 429)) {
                 console.error(`Received a ${error.response.status} error. Restarting the app...`);
+                sleep(10000)
                 process.exit(1)
                 return false; // Assuming you want to stop execution on 502 or 429 errors
             } else {
