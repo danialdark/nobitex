@@ -207,10 +207,9 @@ const startnobitexHistory = async (symbol) => {
 
 
             const candlestickData = response.data.t.map((timestamp, index) => {
-
                 const formattedDateTime = moment(timestamp * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
-                const found = usedOpenTimes.find(usedOpenTime => usedOpenTime == formattedDateTime);
-                usedOpenTimes.push(formattedDateTime)
+                const found = usedOpenTimes.find(usedOpenTime => usedOpenTime == timestamp);
+                usedOpenTimes.push(timestamp)
                 if (found == undefined) {
                     return {
                         symbol_id: fetchedSymbolId,
@@ -226,7 +225,6 @@ const startnobitexHistory = async (symbol) => {
                     };
                 }
             });
-
 
 
 
@@ -287,15 +285,7 @@ const insertCandlestickBatch = async (tableName, batch) => {
 
             const query = pgp.helpers.insert(values, cs) +
                 ` ON CONFLICT (symbol_name, created_at)
-                DO UPDATE
-                SET 
-                    open_time = EXCLUDED.open_time,
-                    open_price = EXCLUDED.open_price,
-                    high_price = EXCLUDED.high_price,
-                    low_price = EXCLUDED.low_price,
-                    close_price = EXCLUDED.close_price,
-                    volumn = EXCLUDED.volumn,
-                    close_time = EXCLUDED.close_time`;
+            DO NOTHING`;
 
             await t.none(query);
 
