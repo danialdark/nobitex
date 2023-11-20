@@ -52,7 +52,7 @@ async function processSymbols() {
         if (symbol.endsWith("IRT")) {
             const { description, lastTradePrice } = symbolsData[symbol];
             IRTSYMBOLS.push(symbol)
-            await insertOrUpdateSymbolToDatabase(symbol, description, lastTradePrice, formattedDateTime);
+            await insertOrUpdateSymbolToDatabase(symbol, description, 1, formattedDateTime);
 
         }
     }
