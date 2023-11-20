@@ -14,7 +14,7 @@ async function fetchSymbolsFromAPI() {
 async function insertOrUpdateSymbolToDatabase(symbol, description, pricescale, formattedDateTime) {
     try {
         await db.none(
-            `INSERT INTO spot_symbols (name, description, quote_precision, created_at)
+            `INSERT INTO forex_symbols (name, description, quote_precision, created_at)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT (name) DO UPDATE
             SET

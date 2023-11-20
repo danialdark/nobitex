@@ -28,7 +28,7 @@ setInterval(() => {
 
 async function getSymbolIdByName(symbolName) {
     try {
-        const query = 'SELECT id FROM spot_symbols WHERE name = $1';
+        const query = 'SELECT id FROM forex_symbols WHERE name = $1';
         const symbol = await db.oneOrNone(query, symbolName);
         return symbol ? symbol.id : null;
     } catch (error) {
@@ -186,7 +186,7 @@ const processCandlestickData = (symbolId, symbolName, data) => {
     });
 };
 
-const startspotHistory = async (symbol) => {
+const startforexHistory = async (symbol) => {
     const timeFrames = ['D', '240', '60', '30', '15', '5', '1'];
     const symbolName = symbol.toUpperCase();
     const fetchedSymbolId = await getSymbolIdByName(symbolName);
@@ -223,25 +223,25 @@ const startspotHistory = async (symbol) => {
 const getTableName = (timeFrame) => {
     switch (timeFrame) {
         case "1M":
-            return "one_month_spot_candles";
+            return "one_month_forex_candles";
         case "1w":
-            return "one_week_spot_candles";
+            return "one_week_forex_candles";
         case "D":
-            return "one_day_spot_candles";
+            return "one_day_forex_candles";
         case "240":
-            return "four_hour_spot_candles";
+            return "four_hour_forex_candles";
         case "60":
-            return "one_hour_spot_candles";
+            return "one_hour_forex_candles";
         case "30":
-            return "thirty_minute_spot_candles";
+            return "thirty_minute_forex_candles";
         case "15":
-            return "fifteen_minute_spot_candles";
+            return "fifteen_minute_forex_candles";
         case "5":
-            return "five_minute_spot_candles";
+            return "five_minute_forex_candles";
         case "1":
-            return "one_minut_spot_candles";
+            return "one_minute_forex_candles";
         case "1s":
-            return "one_second_spot_candles";
+            return "one_second_forex_candles";
         default:
             return null;
     }
@@ -323,7 +323,7 @@ const getLive = async (symbols) => {
             return symbolsChunk.map(async (symbol) => {
                 counter++;
                 // await sleep(counter * delayTime); // Wait for 5 seconds
-                return startspotHistory(symbol.toLowerCase());
+                return startforexHistory(symbol.toLowerCase());
             });
         } else {
             return null;

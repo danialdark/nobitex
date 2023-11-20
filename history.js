@@ -18,7 +18,7 @@ setInterval(() => {
 
 async function getSymbolIdByName(symbolName) {
     try {
-        const query = 'SELECT id FROM spot_symbols WHERE name = $1';
+        const query = 'SELECT id FROM nobitex_symbols WHERE name = $1';
         const symbol = await db.oneOrNone(query, symbolName);
         return symbol ? symbol.id : null;
     } catch (error) {
@@ -56,47 +56,47 @@ async function getLastDateFromPostgres(symbol, timeFrame) {
         switch (timeFrame) {
             case '1s':
                 interval = '3 days';
-                myTable = "one_second_spot_candles"
+                myTable = "one_second_nobitex_candles"
                 break;
             case '1':
                 interval = '2 years';
-                myTable = "one_minut_spot_candles"
+                myTable = "one_minute_nobitex_candles"
                 break;
             case '5':
-                myTable = "five_minute_spot_candles"
+                myTable = "five_minute_nobitex_candles"
                 interval = '2 years';
                 break;
 
             case '15':
-                myTable = "fifteen_minute_spot_candles"
+                myTable = "fifteen_minute_nobitex_candles"
                 interval = '2 years';
                 break;
 
             case '30':
-                myTable = "thirty_minute_spot_candles"
+                myTable = "thirty_minute_nobitex_candles"
                 interval = '2 years';
                 break;
 
             case '60':
-                myTable = "one_hour_spot_candles"
+                myTable = "one_hour_nobitex_candles"
                 interval = '2 years';
                 break;
 
             case '240':
                 interval = '2 years';
-                myTable = "four_hour_spot_candles"
+                myTable = "four_hour_nobitex_candles"
                 break;
             case 'D':
                 interval = '15 days';
-                myTable = "one_day_spot_candles"
+                myTable = "one_day_nobitex_candles"
                 break;
             case '1w':
                 interval = '6 weeks';
-                myTable = "one_week_spot_candles"
+                myTable = "one_week_nobitex_candles"
                 break;
             case '1M':
                 interval = '2 months';
-                myTable = "one_month_spot_candles"
+                myTable = "one_month_nobitex_candles"
                 break;
             default:
                 throw new Error('This time frame is not accepted');
@@ -126,7 +126,7 @@ async function getLastDateFromPostgres(symbol, timeFrame) {
     }
 }
 
-const startspotHistory = async (symbol) => {
+const startnobitexHistory = async (symbol) => {
     const timeFrames = ['D', '240', '60', '30', '15', '5', '1'];
 
     const symbolName = symbol.toUpperCase();
@@ -144,34 +144,34 @@ const startspotHistory = async (symbol) => {
         // checking table name
         switch (timeFrame) {
             case "1M":
-                tableName = "one_month_spot_candles"
+                tableName = "one_month_nobitex_candles"
                 break;
             case "1w":
-                tableName = "one_week_spot_candles"
+                tableName = "one_week_nobitex_candles"
                 break;
             case "D":
-                tableName = "one_day_spot_candles"
+                tableName = "one_day_nobitex_candles"
                 break;
             case "240":
-                tableName = "four_hour_spot_candles"
+                tableName = "four_hour_nobitex_candles"
                 break;
             case "60":
-                tableName = "one_hour_spot_candles"
+                tableName = "one_hour_nobitex_candles"
                 break;
             case "30":
-                tableName = "thirty_minute_spot_candles"
+                tableName = "thirty_minute_nobitex_candles"
                 break;
             case "15":
-                tableName = "fifteen_minute_spot_candles"
+                tableName = "fifteen_minute_nobitex_candles"
                 break;
             case "5":
-                tableName = "five_minute_spot_candles"
+                tableName = "five_minute_nobitex_candles"
                 break;
             case "1":
-                tableName = "one_minut_spot_candles"
+                tableName = "one_minute_nobitex_candles"
                 break;
             case "1s":
-                tableName = "one_second_spot_candles"
+                tableName = "one_second_nobitex_candles"
                 break;
 
             default:
@@ -329,7 +329,7 @@ const getHistory = async (symbols) => {
             return symbolsChunk.map(async (symbol) => {
                 counter++;
                 // await sleep(counter * delayTime); // Wait for 5 seconds
-                return startspotHistory(symbol.toLowerCase());
+                return startnobitexHistory(symbol.toLowerCase());
             });
         } else {
             return null;
