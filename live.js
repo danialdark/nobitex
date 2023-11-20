@@ -28,7 +28,7 @@ setInterval(() => {
 
 async function getSymbolIdByName(symbolName) {
     try {
-        const query = 'SELECT id FROM forex_symbols WHERE name = $1';
+        const query = 'SELECT id FROM nobitex_symbols WHERE name = $1';
         const symbol = await db.oneOrNone(query, symbolName);
         return symbol ? symbol.id : null;
     } catch (error) {
