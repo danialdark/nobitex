@@ -194,7 +194,7 @@ const startspotHistory = async (symbol) => {
 
             const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=${startTime}&to=${currentTimestampInSeconds}&page=${page}`);
             // requestCounter++;
-            page = 500;
+            page++;
 
             if (response.status !== 200) {
                 throw new Error(`Failed to fetch candlestick data. Status: ${response.status}, Message: ${response.statusText}`);
