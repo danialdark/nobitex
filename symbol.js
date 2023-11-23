@@ -11,20 +11,19 @@ async function fetchSymbolsFromAPI() {
     }
 }
 
-async function insertOrUpdateSymbolToDatabase(symbol, description, pricescale, formattedDateTime) {
+async function insertOrUpdateSymbolToDatabase(symbol, pricescale, formattedDateTime) {
     try {
         await db.none(
-            `INSERT INTO nobitex_symbols (name, description, quote_precision, created_at)
-            VALUES ($1, $2, $3, $4)
+            `INSERT INTO nobitex_symbols (name, quote_precision, created_at)
+            VALUES ($1, $2, $3)
             ON CONFLICT (name) DO UPDATE
             SET
                 name = excluded.name,
-                description = excluded.description,
+               
                 quote_precision = excluded.quote_precision,
                 created_at = excluded.created_at`,
             [
                 symbol.toUpperCase(),
-                description,
                 pricescale,
                 formattedDateTime,
             ]
@@ -34,6 +33,10 @@ async function insertOrUpdateSymbolToDatabase(symbol, description, pricescale, f
         console.error('Error saving symbol to PostgreSQL:', error);
     }
 }
+
+
+
+
 
 async function processSymbols() {
     const symbolsData = await fetchSymbolsFromAPI();
@@ -52,7 +55,7 @@ async function processSymbols() {
         if (symbol.endsWith("IRT")) {
             const { description, lastTradePrice } = symbolsData[symbol];
             IRTSYMBOLS.push(symbol)
-            await insertOrUpdateSymbolToDatabase(symbol, description, 1, formattedDateTime);
+            await insertOrUpdateSymbolToDatabase(symbol, 1, formattedDateTime);
 
         }
     }
