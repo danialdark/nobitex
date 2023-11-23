@@ -6,7 +6,7 @@ const db = require('./db'); // Adjust the path as needed
 const Redis = require('ioredis');
 
 const redis = new Redis({
-    host: '91.107.160.210',
+    host: 'localhost',
     port: '6379',
     password: 'D@n!@l12098',
     enableCompression: true,
