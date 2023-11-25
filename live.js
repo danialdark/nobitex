@@ -58,27 +58,40 @@ function formatNumberWithTwoDecimals(number) {
 
 
 async function updateRedisPrice(symbols) {
-    const response = await axios.get(`https://api.nobitex.ir/v2/orderbook/all`);
+    try {
+        const response = await axios.get(`https://api.nobitex.ir/v2/orderbook/all`);
 
-    for (const symbol of symbols) {
-        const symbolKey = symbol.toLowerCase();
-        const existingData = await redis.get(symbolKey);
-        const data = JSON.parse(existingData);
-        for (const timeFrame in data) {
-            if (data.hasOwnProperty(timeFrame)) {
-                var newPrice = response.data[symbol.toUpperCase()].lastTradePrice
-                if (newPrice != undefined) {
-                    data[timeFrame][0].c = newPrice / 10 + ".00";
-                    // console.log(newPrice / 10 + ".00")
+        for (const symbol of symbols) {
+            const symbolKey = symbol.toLowerCase();
+            const existingData = await redis.get(symbolKey);
+            const data = JSON.parse(existingData);
+
+            for (const timeFrame in data) {
+                if (data.hasOwnProperty(timeFrame)) {
+                    try {
+                        var newPrice = response.data[symbol.toUpperCase()].lastTradePrice;
+
+                        if (newPrice !== undefined) {
+                            data[timeFrame][0].c = (newPrice / 10) + ".00";
+                            // console.log(newPrice / 10 + ".00")
+                        }
+                    } catch (priceError) {
+                        console.error(`Error updating price for ${symbol}: ${priceError.message}`);
+                        sleep(10000)
+                        process.exit(1)
+                    }
                 }
             }
+
+            await redis.set(symbolKey, JSON.stringify(data));
         }
-        await redis.set(symbolKey, JSON.stringify(data));
-
+    } catch (error) {
+        console.error(`Error fetching data from API: ${error.message}`);
+        sleep(10000)
+        process.exit(1)
     }
-
-
 }
+
 
 // Helper function to get the time frame key
 const getTimeFrameKey = (timeFrame) => {
