@@ -76,8 +76,8 @@ async function updateRedisPrice(symbols) {
                             // console.log(newPrice / 10 + ".00")
                         }
                     } catch (priceError) {
+                        sleep(20000)
                         console.error(`Error updating price for ${symbol}: ${priceError.message}`);
-                        sleep(10000)
                         process.exit(1)
                     }
                 }
@@ -86,8 +86,8 @@ async function updateRedisPrice(symbols) {
             await redis.set(symbolKey, JSON.stringify(data));
         }
     } catch (error) {
+        sleep(20000)
         console.error(`Error fetching data from API: ${error.message}`);
-        sleep(10000)
         process.exit(1)
     }
 }
@@ -171,8 +171,8 @@ const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSec
         return response.data;
     } catch (error) {
         // const { status, statusText } = error.response;
+        sleep(20000)
         console.error(`Received a error. Restarting the app...`);
-        sleep(10000)
         process.exit(1)
     }
 };
@@ -222,8 +222,8 @@ const startnobitexHistory = async (symbol) => {
             }
         } catch (error) {
 
+            sleep(20000)
             console.error(`Received a error. Restarting the app...`);
-            sleep(10000)
             process.exit(1)
 
         }
