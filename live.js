@@ -215,7 +215,7 @@ const startnobitexHistory = async (symbol) => {
                 }
                 const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
                 requestCounter++;
-                console.log(`request sent for ${symbolName} for ${timeFrame}`)
+                // console.log(`request sent for ${symbolName} for ${timeFrame}`)
                 if (candlestickData.length === 0) {
                     flag = false;
                     continue;
