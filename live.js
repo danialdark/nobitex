@@ -206,19 +206,31 @@ const startnobitexHistory = async (symbol) => {
     const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
 
     for (const timeFrame of timeFrames) {
+        let flag = true;
         try {
-            const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
+            while (flag) {
+                if (requestCounter >= 700) {
+                    requestCounter=0
+                    await sleep(30 * 1000); // Sleep for 1 minute
+                }
+                const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
+                requestCounter++;
+                console.log(`request sent for ${symbolName} for ${timeFrame}`)
+                if (candlestickData.length === 0) {
+                    flag = false;
+                    continue;
+                }
 
-            if (candlestickData.length === 0) {
-                continue;
-            }
+                const processedData = processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
 
-            const processedData = processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
+                if (processedData.length >= 2) {
+                    const lastTwoCandlesticks = processedData.slice(-2);
+                    await saveCandlesToRedis(symbol, timeFrame, lastTwoCandlesticks);
+                    await insertCandlestickBatch(getTableName(timeFrame), lastTwoCandlesticks);
+                }
 
-            if (processedData.length >= 2) {
-                const lastTwoCandlesticks = processedData.slice(-2);
-                await saveCandlesToRedis(symbol, timeFrame, lastTwoCandlesticks);
-                await insertCandlestickBatch(getTableName(timeFrame), lastTwoCandlesticks);
+                flag = false;
+
             }
         } catch (error) {
 
