@@ -170,7 +170,7 @@ const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSec
         const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`);
         return response.data;
     } catch (error) {
-        // const { status, statusText } = error.response;
+        console.log(error)
         sleep(20000)
         console.error(`Received a error. Restarting the app...`);
         process.exit(1)
@@ -210,7 +210,7 @@ const startnobitexHistory = async (symbol) => {
         try {
             while (flag) {
                 if (requestCounter >= 700) {
-                    requestCounter=0
+                    requestCounter = 0
                     await sleep(30 * 1000); // Sleep for 1 minute
                 }
                 const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
@@ -233,7 +233,7 @@ const startnobitexHistory = async (symbol) => {
 
             }
         } catch (error) {
-
+            console.log(error)
             sleep(20000)
             console.error(`Received a error. Restarting the app...`);
             process.exit(1)

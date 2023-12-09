@@ -24,8 +24,8 @@ const { getLive, updateRedisPrice } = require('./live.js');
 // // this will get all active symbols and start streaming
 
 getSpotSymbols().then((data) => {
-    // getHistory(data);
-    getLive(data);
+    getHistory(data);
+    // getLive(data);
 
     setInterval(() => {
         updateRedisPrice(data)
