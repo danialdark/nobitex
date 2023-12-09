@@ -362,7 +362,7 @@ const getLive = async (symbols) => {
             results.forEach((result, index) => {
                 const symbol = symbolChunks[currentChunkIndex - 1][index];
 
-                console.log(`***done getting history for ${symbol}***`);
+                // console.log(`***done getting history for ${symbol}***`);
             });
         } else {
 
