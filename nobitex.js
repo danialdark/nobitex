@@ -25,11 +25,11 @@ const { getLive, updateRedisPrice } = require('./live.js');
 
 getSpotSymbols().then((data) => {
     getHistory(data);
-    // getLive(data);
+    getLive(data);
 
-    // setInterval(() => {
-    //     updateRedisPrice(data)
-    // }, 1500);
+    setInterval(() => {
+        updateRedisPrice(data)
+    }, 1500);
 });
 
 
