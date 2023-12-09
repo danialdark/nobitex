@@ -59,7 +59,7 @@ function formatNumberWithTwoDecimals(number) {
 
 async function updateRedisPrice(symbols) {
     try {
-        const response = await axios.get(`https://api.nobitex.ir/v2/orderbook/all`);
+        const response = await axios.get(`https://api.nobitex.net/v2/orderbook/all`);
 
         for (const symbol of symbols) {
             const symbolKey = symbol.toLowerCase();
@@ -167,7 +167,7 @@ const saveCandlesToRedis = async (symbol, timeFrame, batch) => {
 
 const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSeconds) => {
     try {
-        const response = await axios.get(`https://api.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`);
+        const response = await axios.get(`https://api.nobitex.net/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`, { timeout: 15000 });
         return response.data;
     } catch (error) {
         console.log(error)
@@ -362,7 +362,7 @@ const getLive = async (symbols) => {
             results.forEach((result, index) => {
                 const symbol = symbolChunks[currentChunkIndex - 1][index];
 
-                // console.log(`***done getting history for ${symbol}***`);
+                console.log(`***done getting history for ${symbol}***`);
             });
         } else {
 
