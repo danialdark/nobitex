@@ -19,19 +19,24 @@ setInterval(getSpotSymbols, 86400000);
 const getHistory = require('./history.js');
 
 
-const { getLive, updateRedisPrice } = require('./live.js');
+const { getLive, updateRedisPrice } = require('./newLive.js');
 
 // // this will get all active symbols and start streaming
 
-getSpotSymbols().then((data) => {
-    // getHistory(data);
-    getLive(data);
+// getSpotSymbols().then((data) => {
+//     // getHistory(data);
+//     getLive(["BTCIRT"]);
 
-    setInterval(() => {
-        updateRedisPrice(data)
-    }, 1500);
-});
+//     setInterval(() => {
+//         updateRedisPrice(["BTCIRT"])
+//     }, 1500);
+// });
 
+getLive(["BTCIRT"]);
+
+// setInterval(() => {
+//     updateRedisPrice(["BTCIRT"])
+// }, 1500);
 
 
 app.get('/active', (req, res) => {

@@ -167,7 +167,7 @@ const saveCandlesToRedis = async (symbol, timeFrame, batch) => {
 
 const fetchCandlestickData = async (symbolName, timeFrame, currentTimestampInSeconds) => {
     try {
-        const response = await axios.get(`https://api.nobitex.net/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}`, { timeout: 15000 });
+        const response = await axios.get(`https://chart.nobitex.ir/market/udf/history?symbol=${symbolName}&resolution=${timeFrame}&from=0&to=${currentTimestampInSeconds}&currencyCode=﷼&countback=2`, { timeout: 15000 });
         return response.data;
     } catch (error) {
         console.log(error)
@@ -203,15 +203,16 @@ const startnobitexHistory = async (symbol) => {
     const timeFrames = ['D', '240', '60', '30', '15', '5', '1'];
     const symbolName = symbol.toUpperCase();
     const fetchedSymbolId = await getSymbolIdByName(symbolName);
-    const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
 
     for (const timeFrame of timeFrames) {
+        const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+
         let flag = true;
         try {
             while (flag) {
                 if (requestCounter >= 700) {
                     requestCounter = 0
-                    await sleep(30 * 1000); // Sleep for 1 minute
+                    await sleep(1 * 1000); // Sleep for 1 minute
                 }
                 const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
                 requestCounter++;
@@ -222,7 +223,7 @@ const startnobitexHistory = async (symbol) => {
                 }
 
                 const processedData = processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
-
+                console.log(processedData)
                 if (processedData.length >= 2) {
                     const lastTwoCandlesticks = processedData.slice(-2);
                     await saveCandlesToRedis(symbol, timeFrame, lastTwoCandlesticks);
