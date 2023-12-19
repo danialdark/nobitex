@@ -23,16 +23,15 @@ const { getLive, updateRedisPrice } = require('./newLive.js');
 
 // // this will get all active symbols and start streaming
 
-// getSpotSymbols().then((data) => {
-//     // getHistory(data);
-//     getLive(["BTCIRT"]);
+getSpotSymbols().then((data) => {
+    // getHistory(data);
+    getLive(data);
 
-//     setInterval(() => {
-//         updateRedisPrice(["BTCIRT"])
-//     }, 1500);
-// });
+    // setInterval(() => {
+    //     updateRedisPrice(["BTCIRT"])
+    // }, 1500);
+});
 
-getLive(["BTCIRT"]);
 
 // setInterval(() => {
 //     updateRedisPrice(["BTCIRT"])
