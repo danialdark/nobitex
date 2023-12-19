@@ -118,13 +118,12 @@ const processCandlestickData = (symbolId, symbolName, data) => {
     if (data.s === "no_data") {
         return [];
     }
-
     if (data.t.length === 1) {
         const formattedDateTime = moment(data.t * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
         return [{
             symbol_id: symbolId,
             symbol_name: symbolName,
-            open_time: data.t * 1000,
+            open_time: data.t[0] * 1000,
             open_price: (data.o[0]),
             high_price: (data.h[0]),
             low_price: (data.l[0]),
@@ -383,8 +382,6 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
 }
 
 
-
-
 async function warmUp(symbolName, allCandles) {
     const timeFrames = ['D', '240', '60', '30', '15', '5', '1'];
     const rechangeTimes = {
@@ -404,10 +401,7 @@ async function warmUp(symbolName, allCandles) {
         try {
 
             const candlestickData = await fetchCandlestickData(symbolName, timeFrame, currentTimestampInSeconds);
-
-
             const processedData = await processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
-
             if (processedData.length >= 2) {
                 const lastTwoCandlesticks = processedData.slice(-2);
                 const newCandle = {
@@ -445,10 +439,7 @@ async function warmUp(symbolName, allCandles) {
         }
     }
 
-    // console.log(allCandles)
 }
-
-
 
 
 const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbolName, lastTimeStamp) => {
@@ -724,13 +715,15 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
 
         try {
             if (requestCounter >= symbols.length) {
-                await sleep(5 * 1000); // Sleep for 1 minute
+                await sleep(1 * 1000); // Sleep for 1 minute
             }
             const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
 
             requestCounter++
             const candlestickData = await fetchCandlestickData(symbolName, "1", currentTimestampInSeconds);
             const processedData = await processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
+
+
             let newCandle = null;
             if (processedData[1] == undefined) {
                 newCandle = {
@@ -758,7 +751,6 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             if (allCandles['1m'][0] != undefined) {
                 lastVolume = allCandles['1m'][0].v;
                 lastTimeStamp = allCandles['1m'][0].t;
-                // console.log("last v is: " + allCandles['1m'][0].v)
             }
 
             const existingCandleIndex = allCandles['1m'].findIndex((candle) => candle.t == newCandle.t);
@@ -805,8 +797,6 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
                     }
                 }
             }
-            // console.log("------------------------------------------------------")
-            // console.log(allCandles['1m'])
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
             // console.log('*******************************************************')
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
@@ -819,8 +809,6 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
         }
     }
 };
-
-
 
 
 async function saveCandleDataToPostgreSQL(symbol, timeFrame, newCandle) {
