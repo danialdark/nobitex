@@ -118,8 +118,9 @@ const processCandlestickData = (symbolId, symbolName, data) => {
     if (data.s === "no_data") {
         return [];
     }
+
     if (data.t.length === 1) {
-        const formattedDateTime = moment(data.t * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
+        const formattedDateTime = moment(data.t[0] * 1000).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
         return [{
             symbol_id: symbolId,
             symbol_name: symbolName,
@@ -605,15 +606,6 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                     shouldBe = allCandles[timeframe][0].v + lastOneMinuteCandle.v;
                 }
 
-                // if (timeframe == "5m") {
-                //     console.log("________________________________________")
-                //     console.log("lastOneMinuteCandle.t:", lastOneMinuteCandle.t);
-                //     console.log("lastTimeStamp:", lastTimeStamp);
-                //     console.log("lastOneMinuteCandle.v:", lastOneMinuteCandle.v);
-                //     console.log("lastVolume:", lastVolume);
-                //     console.log("shouldBe:", shouldBe);
-                // }
-
                 openPrice = allCandles[timeframe][0].o;
                 closeTime = allCandles[timeframe][0].t + addedTime
 
@@ -644,10 +636,10 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             const newCandle = {
                 t: startTime,
                 T: closeTime,
-                o: (openPrice),
-                h: (high),
-                l: (low),
-                c: (lastOneMinuteCandle.c),
+                o: openPrice,
+                h: high,
+                l: low,
+                c: lastOneMinuteCandle.c,
                 v: shouldBe,
             };
 
@@ -711,6 +703,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
     const fetchedSymbolId = await getSymbolIdByName(symbolName);
     var lastVolume = 0;
     var lastTimeStamp = 0;
+    var shouldUpdate = false;
     while (true) {
 
         try {
@@ -722,21 +715,27 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             requestCounter++
             const candlestickData = await fetchCandlestickData(symbolName, "1", currentTimestampInSeconds);
             const processedData = await processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
+            const reversedData = processedData.reverse();
 
+            if (reversedData.length == 1) {
+                shouldUpdate = true;
+            }
 
             let newCandle = null;
-            if (processedData[1] == undefined) {
-                newCandle = {
-                    t: processedData[0].open_time,
-                    T: processedData[0].open_time + 60000,
-                    o: formatNumberWithTwoDecimals(processedData[0].open_price),
-                    h: formatNumberWithTwoDecimals(processedData[0].high_price),
-                    l: formatNumberWithTwoDecimals(processedData[0].low_price),
-                    c: formatNumberWithTwoDecimals(processedData[0].close_price),
-                    v: processedData[0].volumn,
-                };
-            } else {
-                newCandle = {
+            let oldCandle = null;
+            newCandle = {
+                t: reversedData[0].open_time,
+                T: reversedData[0].open_time + 60000,
+                o: formatNumberWithTwoDecimals(reversedData[0].open_price),
+                h: formatNumberWithTwoDecimals(reversedData[0].high_price),
+                l: formatNumberWithTwoDecimals(reversedData[0].low_price),
+                c: formatNumberWithTwoDecimals(reversedData[0].close_price),
+                v: reversedData[0].volumn,
+            };
+
+            // this will update last candle
+            if (reversedData[1] != undefined) {
+                oldCandle = {
                     t: processedData[1].open_time,
                     T: processedData[1].open_time + 60000,
                     o: formatNumberWithTwoDecimals(processedData[1].open_price),
@@ -748,9 +747,20 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
 
+            if (reversedData.length == 2 && shouldUpdate) {
+                newCandle = oldCandle;
+                shouldUpdate = false
+            }
+
+
+
             if (allCandles['1m'][0] != undefined) {
                 lastVolume = allCandles['1m'][0].v;
                 lastTimeStamp = allCandles['1m'][0].t;
+            }
+
+            if (oldCandle != null) {
+                allCandles['1m'][1] = oldCandle;
             }
 
             const existingCandleIndex = allCandles['1m'].findIndex((candle) => candle.t == newCandle.t);
@@ -797,8 +807,8 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
                     }
                 }
             }
+
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
-            // console.log('*******************************************************')
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
