@@ -716,6 +716,9 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             const candlestickData = await fetchCandlestickData(symbolName, "1", currentTimestampInSeconds);
             const processedData = await processCandlestickData(fetchedSymbolId, symbolName, candlestickData);
             const reversedData = processedData.reverse();
+            if (reversedData[0] == undefined) {
+                continue;
+            }
 
             if (reversedData.length == 1) {
                 shouldUpdate = true;
