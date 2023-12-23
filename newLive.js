@@ -324,7 +324,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const shouldAdd = 30;
         // Remove numbers less than candleHour
 
-        const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
+        const shouldRemoveHour = 1;
         // Remove numbers less than candleHour
 
         if (timeFrame == "1w") {
