@@ -334,7 +334,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const shouldAdd = timeFrame == "1h" ? 30 : 0;
         // Remove numbers less than candleHour
 
-        const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
+        const shouldRemoveHour = timeFrame == "1h" ? 1 : 0;
         // Remove numbers less than candleHour
 
         if (timeFrame == "1w") {
@@ -552,11 +552,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             var startTime = 0;
             var newV = false
             var checker = await candleChecker(timeframe, allCandles, symbolConfig, candleStamp);
-            // if (timeframe == "1h") {
-            //     console.log(candleStamp)
-            //     console.log(checker)
-
-            // }
+         
             switch (timeframe) {
                 case '5m':
                     addedTime = 300;
@@ -830,6 +826,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
+
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
