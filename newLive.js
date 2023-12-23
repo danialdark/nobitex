@@ -174,11 +174,8 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
-    var shouldAdd = 0
-    if (timeFrame == "1h") {
-        shouldAdd = 3600000;
-    }
-    const myCandleTime = new Date(candleTimeStamp + shouldAdd);
+
+    const myCandleTime = new Date(candleTimeStamp);
     const myCandleHour = myCandleTime.getUTCHours();
     const myCandleMinute = myCandleTime.getUTCMinutes();
     const dayOfCandle = myCandleTime.getUTCDate();
@@ -324,10 +321,10 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
 
-        const shouldAdd = 30;
+        const shouldAdd = symbolConfig.isHalf ? 30 : 0;
         // Remove numbers less than candleHour
 
-        const shouldRemoveHour = timeFrame == "1h" ? 1 : 0;
+        const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
         // Remove numbers less than candleHour
 
         if (timeFrame == "1w") {
@@ -545,7 +542,6 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             var startTime = 0;
             var newV = false
             var checker = await candleChecker(timeframe, allCandles, symbolConfig, candleStamp);
-
             switch (timeframe) {
                 case '5m':
                     addedTime = 300;
@@ -816,8 +812,6 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
-            // console.log(allCandles)
-
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
