@@ -169,13 +169,16 @@ function getFirstDayOfMonthNotSaturday() {
 
 // isHalf be in mani hast ke aya namad rooye 1 baz mishe ya 1 o 30 dar time frame haye 30 1 4 1d
 const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinuteTime) => {
-    const oneMinuteCandleTime = new Date(oneMinuteTime + 12600);
+    const oneMinuteCandleTime = new Date(oneMinuteTime);
     const dayOfWeek = oneMinuteCandleTime.getUTCDay(); //0 is sunday
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
-
-    const myCandleTime = new Date(candleTimeStamp + 12600);
+    var shouldAdd = 0
+    if (timeFrame == "1h") {
+        shouldAdd = 3600000;
+    }
+    const myCandleTime = new Date(candleTimeStamp + shouldAdd);
     const myCandleHour = myCandleTime.getUTCHours();
     const myCandleMinute = myCandleTime.getUTCMinutes();
     const dayOfCandle = myCandleTime.getUTCDate();
@@ -814,6 +817,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
             // console.log(allCandles)
+
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
