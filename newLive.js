@@ -321,7 +321,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
 
-        const shouldAdd = symbolConfig.isHalf ? 30 : 0;
+        const shouldAdd = 30;
         // Remove numbers less than candleHour
 
         const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
@@ -812,7 +812,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
-            console.log(allCandles)
+            // console.log(allCandles)
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
@@ -887,7 +887,7 @@ const getLive = async (symbols) => {
                 counter++;
                 var allCandles = { "1m": [], "5m": [], "15m": [], "30m": [], "1h": [], "4h": [], "1d": [], "1w": [], "1M": [] };
 
-                await warmUp(symbol.toLowerCase(), allCandles)
+                // await warmUp(symbol.toLowerCase(), allCandles)
                 startnobitexHistory(symbol.toLowerCase(), symbols, allCandles);
             });
         } else {
