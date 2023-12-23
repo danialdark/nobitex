@@ -321,10 +321,10 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
 
-        const shouldAdd = 30;
+        const shouldAdd = symbolConfig.isHalf ? 30 : 0;
         // Remove numbers less than candleHour
 
-        const shouldRemoveHour = 1;
+        const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
         // Remove numbers less than candleHour
 
         if (timeFrame == "1w") {
@@ -537,7 +537,6 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
 
     if (lastOneMinuteCandle != undefined) {
         for (const timeframe of resultArray) {
-
             var shouldContinueCandle = false;
             var addedTime = 0;
             var startTime = 0;
@@ -588,7 +587,6 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                 timestamp = startTime; // Unix timestamp in seconds
             } else {
                 const madeOpenTime = await makeMyOpenTime(symbolConfig, timeframe);
-               
                 startTime = madeOpenTime * 1000
             }
 
