@@ -169,13 +169,13 @@ function getFirstDayOfMonthNotSaturday() {
 
 // isHalf be in mani hast ke aya namad rooye 1 baz mishe ya 1 o 30 dar time frame haye 30 1 4 1d
 const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinuteTime) => {
-    const oneMinuteCandleTime = new Date(oneMinuteTime);
+    const oneMinuteCandleTime = new Date(oneMinuteTime+12600);
     const dayOfWeek = oneMinuteCandleTime.getUTCDay(); //0 is sunday
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
 
-    const myCandleTime = new Date(candleTimeStamp);
+    const myCandleTime = new Date(candleTimeStamp+12600);
     const myCandleHour = myCandleTime.getUTCHours();
     const myCandleMinute = myCandleTime.getUTCMinutes();
     const dayOfCandle = myCandleTime.getUTCDate();
