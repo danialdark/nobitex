@@ -169,13 +169,13 @@ function getFirstDayOfMonthNotSaturday() {
 
 // isHalf be in mani hast ke aya namad rooye 1 baz mishe ya 1 o 30 dar time frame haye 30 1 4 1d
 const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinuteTime) => {
-    const oneMinuteCandleTime = new Date(oneMinuteTime+12600);
+    const oneMinuteCandleTime = new Date(oneMinuteTime + 12600);
     const dayOfWeek = oneMinuteCandleTime.getUTCDay(); //0 is sunday
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
 
-    const myCandleTime = new Date(candleTimeStamp+12600);
+    const myCandleTime = new Date(candleTimeStamp + 12600);
     const myCandleHour = myCandleTime.getUTCHours();
     const myCandleMinute = myCandleTime.getUTCMinutes();
     const dayOfCandle = myCandleTime.getUTCDate();
@@ -324,7 +324,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const shouldAdd = 30;
         // Remove numbers less than candleHour
 
-        const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
+        const shouldRemoveHour = timeFrame == "1h" ? 1 : 0;
         // Remove numbers less than candleHour
 
         if (timeFrame == "1w") {
@@ -542,6 +542,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             var startTime = 0;
             var newV = false
             var checker = await candleChecker(timeframe, allCandles, symbolConfig, candleStamp);
+
             switch (timeframe) {
                 case '5m':
                     addedTime = 300;
