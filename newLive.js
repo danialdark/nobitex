@@ -175,10 +175,13 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
 
+
     const myCandleTime = new Date(candleTimeStamp);
     const myCandleHour = myCandleTime.getUTCHours();
     const myCandleMinute = myCandleTime.getUTCMinutes();
     const dayOfCandle = myCandleTime.getUTCDate();
+
+
 
 
     if (timeFrame == "5m" || timeFrame == "15m" || timeFrame == "30m") {
@@ -213,6 +216,10 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
         const minIndex = AllArray.indexOf(biggerTime);
 
         var oneBeforBigger = minIndex != 0 ? AllArray[minIndex - 1] : AllArray[0];
+
+        if (timeFrame == "1h") {
+            oneBeforBigger+1
+        }
 
         if (biggerTime == undefined || biggerTime == Infinity || biggerTime == AllArray[0]) {
 
@@ -252,11 +259,14 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
                 }
             }
 
+
+
             // this will work for 4h 
             if (biggerTime <= myCandleHour && myCandleHour >= oneBeforBigger) {
                 // sat 22 23
                 return true;
             } else {
+
                 // for 0 1 
                 if (myCandleHour <= oneBeforBigger) {
                     return true
@@ -321,7 +331,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         const AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
 
-        const shouldAdd = symbolConfig.isHalf ? 30 : 0;
+        const shouldAdd = timeFrame == "1h" ? 30 : 0;
         // Remove numbers less than candleHour
 
         const shouldRemoveHour = symbolConfig.isHalf ? 1 : 0;
@@ -542,6 +552,11 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             var startTime = 0;
             var newV = false
             var checker = await candleChecker(timeframe, allCandles, symbolConfig, candleStamp);
+            // if (timeframe == "1h") {
+            //     console.log(candleStamp)
+            //     console.log(checker)
+
+            // }
             switch (timeframe) {
                 case '5m':
                     addedTime = 300;
@@ -587,6 +602,9 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                 timestamp = startTime; // Unix timestamp in seconds
             } else {
                 const madeOpenTime = await makeMyOpenTime(symbolConfig, timeframe);
+                // if (timeframe == "1h") {
+                //     console.log(madeOpenTime)
+                // }
                 startTime = madeOpenTime * 1000
             }
 
@@ -885,7 +903,6 @@ const getLive = async (symbols) => {
             return symbolsChunk.map(async (symbol) => {
                 counter++;
                 var allCandles = { "1m": [], "5m": [], "15m": [], "30m": [], "1h": [], "4h": [], "1d": [], "1w": [], "1M": [] };
-
                 await warmUp(symbol.toLowerCase(), allCandles)
                 startnobitexHistory(symbol.toLowerCase(), symbols, allCandles);
             });
