@@ -277,9 +277,9 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
             }
         }
 
-        if (timeFrame == "1h" && candleMinute < 30) {
-            biggerTime --
-            oneBeforBigger --
+        if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute < 30) {
+            biggerTime--
+            oneBeforBigger--
         }
 
         // yani hanooz be candle badi nareside va bayad edame bede
@@ -334,7 +334,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame) {
         let shouldAdd = 0;
         let shouldRemoveHour = 0;
 
-        if (timeFrame == "1h" && candleMinute >= 30) {
+        if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
             shouldAdd = 30;
             shouldRemoveHour = 0;
         }
@@ -554,7 +554,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             var startTime = 0;
             var newV = false
             var checker = await candleChecker(timeframe, allCandles, symbolConfig, candleStamp);
-            
+
 
             switch (timeframe) {
                 case '5m':
@@ -601,7 +601,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                 timestamp = startTime; // Unix timestamp in seconds
             } else {
                 const madeOpenTime = await makeMyOpenTime(symbolConfig, timeframe);
-             
+
                 startTime = madeOpenTime * 1000
             }
 
