@@ -27,6 +27,7 @@ const { getLive, updateRedisPrice } = require('./newLive.js');
 getSpotSymbols().then((data) => {
     getLive(data);
 });
+// getLive(["BTCIRT"]);
 
 
 setTimeout(async () => {
