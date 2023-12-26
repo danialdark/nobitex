@@ -25,7 +25,9 @@ const { getLive, updateRedisPrice } = require('./newLive.js');
 // this will get all active symbols and start streaming
 
 getSpotSymbols().then((data) => {
-    getHistory(data);
+    // getHistory(data);
+getLive(data);
+
 });
 // getLive(["BTCIRT"]);
 
