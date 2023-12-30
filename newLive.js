@@ -175,11 +175,16 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
 
+    if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
+        shouldAdd = 30;
+        shouldRemoveHour = 0;
+    }
 
     const myCandleTime = new Date(candleTimeStamp);
     const myCandleHour = myCandleTime.getUTCHours();
-    const myCandleMinute = myCandleTime.getUTCMinutes();
+    const myCandleMinute = (myCandleTime.getUTCMinutes() + shouldAdd);
     const dayOfCandle = myCandleTime.getUTCDate();
+
 
 
 
@@ -295,63 +300,7 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 
 async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
 
-    if (allCandles[timeFrame][0] != undefined) {
-        var addedTime = 0;
-        switch (timeFrame) {
-            case "5m":
-                addedTime = 300;
-                break;
-            case "15m":
-                addedTime = 900;
-                break;
-            case "30m":
-                addedTime = 1800;
-                break;
-            case "1h":
-                addedTime = 3600;
-                break;
-            case "4h":
-                addedTime = 4 * 3600;
-                break;
-            case "1d":
-                addedTime = 24 * 3600;
-                break;
-            case "1w":
-                addedTime = 7 * 24 * 3600;
-                break;
-            case "1M":
-                addedTime = 30 * 24 * 3600;
-                break;
 
-            default:
-                addedTime = 0;
-                break;
-        }
-        const candleTime = new Date((allCandles[timeFrame][0].t + addedTime));
-        var dayOfMonth = candleTime.getUTCDate();
-        const candleHour = candleTime.getUTCHours();
-        const candleMinute = candleTime.getUTCMinutes();
-        const candleYear = candleTime.getUTCFullYear();
-        const candleMonth = candleTime.getUTCMonth();
-
-        if (timeFrame == "1w") {
-            const today = new Date();
-            const currentDay = today.getDay();
-            const daysToMonday = (currentDay === 0 ? 6 : currentDay - 1); // Calculate days from today to Monday
-
-            const firstDay = new Date(today);
-            firstDay.setDate(today.getDate() - daysToMonday); // Set to the first day of the week (Monday)
-
-            dayOfMonth = firstDay.getUTCDate();
-        }
-
-        if (timeFrame == "1M") {
-            dayOfMonth = 1;
-        }
-
-
-        return new Date(Date.UTC(candleYear, candleMonth, dayOfMonth, candleHour, candleMinute)).getTime() / 1000;
-    }
 
 
 
