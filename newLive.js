@@ -889,7 +889,6 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
-            console.log(allCandles);
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
