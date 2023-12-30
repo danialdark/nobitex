@@ -174,10 +174,9 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
     const candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
-
+    var shouldAdd = 0;
     if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
         shouldAdd = 30;
-        shouldRemoveHour = 0;
     }
 
     const myCandleTime = new Date(candleTimeStamp);
