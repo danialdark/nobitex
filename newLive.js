@@ -293,7 +293,69 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     }
 }
 
-async function makeMyOpenTime(symbolConfig, timeFrame) {
+async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
+
+    if (allCandles[timeFrame][0] != undefined) {
+        var addedTime = 0;
+        switch (timeFrame) {
+            case "5m":
+                addedTime = 300;
+                break;
+            case "15m":
+                addedTime = 900;
+                break;
+            case "30m":
+                addedTime = 1800;
+                break;
+            case "1h":
+                addedTime = 3600;
+                break;
+            case "4h":
+                addedTime = 4 * 3600;
+                break;
+            case "1d":
+                addedTime = 24 * 3600;
+                break;
+            case "1w":
+                addedTime = 7 * 24 * 3600;
+                break;
+            case "1M":
+                addedTime = 30 * 24 * 3600;
+                break;
+
+            default:
+                addedTime = 0;
+                break;
+        }
+        const candleTime = new Date((allCandles[timeFrame][0].t + addedTime));
+        var dayOfMonth = candleTime.getUTCDate();
+        const candleHour = candleTime.getUTCHours();
+        const candleMinute = candleTime.getUTCMinutes();
+        const candleYear = candleTime.getUTCFullYear();
+        const candleMonth = candleTime.getUTCMonth();
+
+        if (timeFrame == "1w") {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const daysToMonday = (currentDay === 0 ? 6 : currentDay - 1); // Calculate days from today to Monday
+
+            const firstDay = new Date(today);
+            firstDay.setDate(today.getDate() - daysToMonday); // Set to the first day of the week (Monday)
+
+            dayOfMonth = firstDay.getUTCDate();
+        }
+
+        if (timeFrame == "1M") {
+            dayOfMonth = 1;
+        }
+
+
+        return new Date(Date.UTC(candleYear, candleMonth, dayOfMonth, candleHour, candleMinute)).getTime() / 1000;
+    }
+
+
+
+
     const candleTime = new Date();
     var dayOfMonth = candleTime.getUTCDate();
     const candleHour = candleTime.getUTCHours();
@@ -600,7 +662,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                 startTime = allCandles[timeframe][0].t;
                 timestamp = startTime; // Unix timestamp in seconds
             } else {
-                const madeOpenTime = await makeMyOpenTime(symbolConfig, timeframe);
+                const madeOpenTime = await makeMyOpenTime(symbolConfig, timeframe, allCandles);
 
                 startTime = madeOpenTime * 1000
             }
@@ -827,6 +889,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
+            console.log(allCandles);
             redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
