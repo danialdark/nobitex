@@ -211,8 +211,8 @@ const insertCandlestickBatch = async (tableName, batch) => {
 async function removeOldData() {
     const today = new Date().toISOString().split('T')[0];
 
-    await db.any('DELETE FROM one_hour_nobitex_candles WHERE created_at::date = $1', [today]);
-    await db.any('DELETE FROM four_hour_nobitex_candles WHERE created_at::date = $1', [today]);
+    await db.any('DELETE FROM one_hour_nobitex_candles WHERE created_at::date >= $1', [today]);
+    await db.any('DELETE FROM four_hour_nobitex_candles WHERE created_at::date >= $1', [today]);
 
     return true;
 }
