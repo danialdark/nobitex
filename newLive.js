@@ -185,8 +185,6 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const dayOfCandle = myCandleTime.getUTCDate();
 
 
-
-
     if (timeFrame == "5m" || timeFrame == "15m" || timeFrame == "30m") {
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleMinute);
         const AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
@@ -207,14 +205,12 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 
 
     } else {
-
-
-
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
         var AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
 
 
         var biggerTime = Math.min(...filteredArray);
+
 
         // Find the index of the smallest Number
         const minIndex = AllArray.indexOf(biggerTime);
@@ -285,16 +281,18 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 
 
 
-        if ((timeFrame == "4h") && candleMinute < 30) {
+        if (timeFrame == "4h" && candleMinute < 30) {
             biggerTime -= 4
             oneBeforBigger -= 4
         }
 
 
-        if ((timeFrame == "1h") && candleMinute < 30) {
+        if (timeFrame == "1h" && candleMinute < 30) {
             biggerTime--
             oneBeforBigger--
         }
+
+
 
 
         // yani hanooz be candle badi nareside va bayad edame bede
@@ -309,12 +307,6 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 }
 
 async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
-
-
-
-
-
-
     const candleTime = new Date();
     var dayOfMonth = candleTime.getUTCDate();
     const candleHour = candleTime.getUTCHours();
@@ -404,6 +396,7 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
+
         // console.log(checker +" for " + timeFrame)
         return checker;
     }
