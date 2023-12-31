@@ -32,11 +32,10 @@ getSpotSymbols().then((data) => {
 
 
 setTimeout(async () => {
-    refresher(["all"], ["all"], 4);
-    // console.log("refreshing the app");
+    refresher(["all"], ["all"], 1);
     process.exit(1);
 
-}, 30 * 60000);
+}, 20 * 60000);
 
 
 app.get('/active', (req, res) => {

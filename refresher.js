@@ -208,13 +208,24 @@ const insertCandlestickBatch = async (tableName, batch) => {
 };
 
 
+async function removeOldData() {
+    const today = new Date().toISOString().split('T')[0];
+
+    await db.any('DELETE FROM one_hour_nobitex_candles WHERE created_at::date = $1', [today]);
+    await db.any('DELETE FROM four_hour_nobitex_candles WHERE created_at::date = $1', [today]);
+
+    return true;
+}
+
+
 const refresher = async (symbols, timeFrames, consolePage) => {
+    await removeOldData();
     const chunkSize = 1;
     const symbolChunks = [];
     // const delayTime = 3000;
     let currentIndex = 0;
 
-     timeFrames = ["1","5","15","30","60","240","D"]
+    timeFrames = ["1", "5", "15", "30", "60", "240", "D"]
     // Retrieve active symbols from the local PostgreSQL database
     const symbolNames = await db.any('SELECT name FROM nobitex_symbols WHERE status = 1');
 
