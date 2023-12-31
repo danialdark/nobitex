@@ -172,7 +172,7 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     const oneMinuteCandleTime = new Date(oneMinuteTime);
     const dayOfWeek = oneMinuteCandleTime.getUTCDay(); //0 is sunday
     const dayOfMonth = oneMinuteCandleTime.getUTCDate();  //0 is sunday
-    const candleHour = oneMinuteCandleTime.getUTCHours();
+    var candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
     var shouldAdd = 0;
     if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
@@ -207,13 +207,14 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 
 
     } else {
+
+
+
         const filteredArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num > candleHour);
         var AllArray = symbolConfig[dayOfWeek][timeFrame].filter(num => num >= 0);
 
 
         var biggerTime = Math.min(...filteredArray);
-
-
 
         // Find the index of the smallest Number
         const minIndex = AllArray.indexOf(biggerTime);
@@ -281,10 +282,20 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
             }
         }
 
-        if ((timeFrame == "1h" ) && candleMinute < 30) {
+
+
+
+        if ((timeFrame == "4h") && candleMinute < 30) {
+            biggerTime -= 4
+            oneBeforBigger -= 4
+        }
+
+
+        if ((timeFrame == "1h") && candleMinute < 30) {
             biggerTime--
             oneBeforBigger--
         }
+
 
         // yani hanooz be candle badi nareside va bayad edame bede
         if (+oneBeforBigger <= +myCandleHour && +myCandleHour < +biggerTime) {
@@ -393,7 +404,9 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
-     
+        if (timeFrame == "4h") {
+            console.log(checker)
+        }
         // console.log(checker +" for " + timeFrame)
         return checker;
     }

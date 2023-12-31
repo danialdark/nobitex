@@ -29,7 +29,6 @@ getSpotSymbols().then((data) => {
     getLive(data);
 
 });
-// getLive(["BTCIRT"]);
 
 
 setTimeout(async () => {
