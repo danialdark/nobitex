@@ -404,9 +404,6 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
-        if (timeFrame == "4h") {
-            console.log(checker)
-        }
         // console.log(checker +" for " + timeFrame)
         return checker;
     }
