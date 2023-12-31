@@ -281,7 +281,7 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
             }
         }
 
-        if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute < 30) {
+        if ((timeFrame == "1h" ) && candleMinute < 30) {
             biggerTime--
             oneBeforBigger--
         }
@@ -393,6 +393,7 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
+     
         // console.log(checker +" for " + timeFrame)
         return checker;
     }
@@ -911,7 +912,6 @@ const getLive = async (symbols) => {
                 counter++;
                 var allCandles = { "1m": [], "5m": [], "15m": [], "30m": [], "1h": [], "4h": [], "1d": [], "1w": [], "1M": [] };
                 await warmUp(symbol.toLowerCase(), allCandles)
-
                 startnobitexHistory(symbol.toLowerCase(), symbols, allCandles);
             });
         } else {
