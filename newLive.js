@@ -281,7 +281,7 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
 
 
 
-        if (timeFrame == "4h" && candleMinute < 30) {
+        if (timeFrame == "4h" && ((candleHour == 0) || (candleHour == 4) || (candleHour == 8) || (candleHour == 12) || (candleHour == 20) || (candleHour == 24)) && candleMinute < 30) {
             biggerTime -= 4
             oneBeforBigger -= 4
         }
@@ -398,9 +398,6 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
-        if (timeFrame == "1h") {
-            console.log(checker)
-        }
         // console.log(checker +" for " + timeFrame)
         return checker;
     }
@@ -623,6 +620,8 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
                 startTime = madeOpenTime * 1000
             }
 
+
+
             var shouldBe = 0;
             var openPrice, high, low, closeTime;
 
@@ -683,6 +682,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
             if (existingCandleIndex >= 0) {
                 // Update existing candle
                 allCandles[timeframe][existingCandleIndex] = newCandle;
+
             } else {
 
                 // Add new candle at the beginning
@@ -725,6 +725,7 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
 
 
             }
+
         }
 
     }
