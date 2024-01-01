@@ -398,6 +398,9 @@ const candleChecker = async (timeFrame, allCandles, symbolConfig, candleStamp) =
         // check mishavad ke aya bayad edame dade shavad ya kheir
         // bayad check konim ke data ke alan oomade az lahaze zamani ba config set hast ya na?
         const checker = await checkConfigTime(allCandles[timeFrame][0].t, symbolConfig, timeFrame, candleStamp)
+        if (timeFrame == "1h") {
+            console.log(checker)
+        }
         // console.log(checker +" for " + timeFrame)
         return checker;
     }
@@ -723,7 +726,6 @@ const makeOtherCandles = async (allCandles, smallestTimeFrame, lastVolume, symbo
 
             }
         }
-        redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
 
     }
 }
@@ -916,7 +918,7 @@ const getLive = async (symbols) => {
                 counter++;
                 var allCandles = { "1m": [], "5m": [], "15m": [], "30m": [], "1h": [], "4h": [], "1d": [], "1w": [], "1M": [] };
                 await warmUp(symbol.toLowerCase(), allCandles)
-                // console.log(allCandles)
+
                 startnobitexHistory(symbol.toLowerCase(), symbols, allCandles);
             });
         } else {
