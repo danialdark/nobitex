@@ -35,7 +35,7 @@ setTimeout(async () => {
     refresher(["all"], ["all"], 1);
     process.exit(1);
 
-}, 20 * 60000);
+}, 30 * 60000);
 
 
 app.get('/active', (req, res) => {
