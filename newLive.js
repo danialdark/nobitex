@@ -347,9 +347,8 @@ async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
         let shouldAdd = 0;
         let shouldRemoveHour = 0;
 
-        if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
+        if (timeFrame == "1h" || timeFrame == "4h") {
             shouldAdd = 30;
-            shouldRemoveHour = 0;
         }
 
         if (timeFrame == "1w") {
@@ -369,6 +368,8 @@ async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
 
         var biggerTime = Math.min(...filteredArray);
         if (biggerTime == undefined || biggerTime == Infinity || biggerTime == AllArray[0]) {
+            console.log("________________________________")
+
             return new Date(Date.UTC(candleYear, candleMonth, dayOfMonth, AllArray[AllArray.length - 1] - shouldRemoveHour, 0 + shouldAdd)).getTime() / 1000;
         }
         // Find the index of the biggerTime Number
@@ -379,6 +380,7 @@ async function makeMyOpenTime(symbolConfig, timeFrame, allCandles) {
 
         // yani hanooz be candle badi nareside va bayad edame bede
         if (oneBeforBigger < candleHour < biggerTime) {
+
             return new Date(Date.UTC(candleYear, candleMonth, dayOfMonth, oneBeforBigger - shouldRemoveHour, 0 + shouldAdd)).getTime() / 1000;
         } else {
             // yani candle jadid bayad baz beshe
