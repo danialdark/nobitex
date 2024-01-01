@@ -844,7 +844,7 @@ const startnobitexHistory = async (symbol, symbols, allCandles) => {
             }
 
             await makeOtherCandles(allCandles, "1m", lastVolume, symbolName, lastTimeStamp)
-            redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
+            await redis.pipeline().set(`${symbolName.toLowerCase()}`, JSON.stringify(allCandles)).expire(`${symbolName.toLowerCase()}`, 259200).exec();
         } catch (error) {
             console.log(error)
             sleep(20000)
@@ -918,7 +918,6 @@ const getLive = async (symbols) => {
                 counter++;
                 var allCandles = { "1m": [], "5m": [], "15m": [], "30m": [], "1h": [], "4h": [], "1d": [], "1w": [], "1M": [] };
                 await warmUp(symbol.toLowerCase(), allCandles)
-
                 startnobitexHistory(symbol.toLowerCase(), symbols, allCandles);
             });
         } else {
