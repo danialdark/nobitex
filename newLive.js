@@ -175,7 +175,7 @@ const checkConfigTime = async (candleTimeStamp, symbolConfig, timeFrame, oneMinu
     var candleHour = oneMinuteCandleTime.getUTCHours();
     const candleMinute = oneMinuteCandleTime.getUTCMinutes();
     var shouldAdd = 0;
-    if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute >= 30) {
+    if ((timeFrame == "1h" || timeFrame == "4h") && candleMinute > 30) {
         shouldAdd = 30;
     }
 
